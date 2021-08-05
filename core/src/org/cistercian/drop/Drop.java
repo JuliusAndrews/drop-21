@@ -14,17 +14,21 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-
 import java.util.Iterator;
 
+
+/**
+ * This class is the main class of the game.
+ */
 public class Drop extends ApplicationAdapter {
+
 	// constants
-	public static final int WORLD_WIDTH = 800;
-	public static final int WORLD_HEIGHT = 480;
-	public static final int SPRITE_SIZE = 64;
-	public static final int RAINDROP_SPEED = 200;
-	public static final int RAINDROP_INTERVAL = 1_000_000_000;
-	public static final int BUCKET_SPEED = 200;
+	private static final int WORLD_WIDTH = 800;
+	private static final int WORLD_HEIGHT = 480;
+	private static final int SPRITE_SIZE = 64;
+	private static final int RAINDROP_SPEED = 200;
+	private static final int RAINDROP_INTERVAL = 1_000_000_000;
+	private static final int BUCKET_SPEED = 200;
 
 	// fields
 	private Texture dropImage;
@@ -37,6 +41,11 @@ public class Drop extends ApplicationAdapter {
 	private Array<Rectangle> raindrops;
 	private long lastDropTime;
 
+
+	/**
+	 * This method creates the various objects needed for the game. It runs once at the
+	 * beginning of the game.
+	 */
 	@Override
 	public void create () {
 		// load the images for the droplet and the bucket, 64x64 pixels each
@@ -68,6 +77,10 @@ public class Drop extends ApplicationAdapter {
 		spawnRaindrop();
 	}
 
+
+	/**
+	 * This method is called by every frame. It updates the game state and renders the game world.
+	 */
 	@Override
 	public void render () {
 		ScreenUtils.clear(0, 0, 0.2f, 1);
@@ -122,7 +135,12 @@ public class Drop extends ApplicationAdapter {
 			}
 		}
 	}
-	
+
+
+	/**
+	 * This method is called when the application is disposed in order to dispose of
+	 * all internal resources.
+	 */
 	@Override
 	public void dispose () {
 		dropImage.dispose();
@@ -132,6 +150,7 @@ public class Drop extends ApplicationAdapter {
 		batch.dispose();
 	}
 
+	/* This method creates an individual raindrop and resets the lastDropTime. */
 	private void spawnRaindrop() {
 		Rectangle raindrop = new Rectangle();
 		raindrop.x = MathUtils.random(0, WORLD_WIDTH - SPRITE_SIZE);
