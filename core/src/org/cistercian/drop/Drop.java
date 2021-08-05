@@ -23,8 +23,8 @@ import java.util.Iterator;
 public class Drop extends ApplicationAdapter {
 
 	// constants
-	private static final int WORLD_WIDTH = 800;
-	private static final int WORLD_HEIGHT = 480;
+	public static final int WORLD_WIDTH = 800;
+	public static final int WORLD_HEIGHT = 480;
 	private static final int SPRITE_SIZE = 64;
 	private static final int RAINDROP_SPEED = 200;
 	private static final int RAINDROP_INTERVAL = 1_000_000_000;
