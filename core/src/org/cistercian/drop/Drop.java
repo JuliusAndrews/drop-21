@@ -26,9 +26,9 @@ public class Drop extends ApplicationAdapter {
 	public static final int WORLD_WIDTH = 800;
 	public static final int WORLD_HEIGHT = 480;
 	private static final int SPRITE_SIZE = 64;
-	private static final int RAINDROP_SPEED = 300;
+	private static final int RAINDROP_SPEED = 1200;
 	private static final int RAINDROP_INTERVAL = 1_000_000_000;
-	private static final int BUCKET_SPEED = 300;
+	private static final int BUCKET_SPEED = 1200;
 
 	// fields
 	private Texture dropImage;
