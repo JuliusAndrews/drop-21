@@ -37,6 +37,7 @@ public class GameScreen implements Screen {
 	Array<Rectangle> raindrops;
 	long lastDropTime;
 	int dropsGathered;
+    int highScore;
 
     /**
      * Create the objects for this screen. Note that Screens use the constructor rather than a
@@ -109,6 +110,7 @@ public class GameScreen implements Screen {
 		// all drops
 		game.batch.begin();
 		game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 0, Drop.WORLD_HEIGHT);
+        game.font.draw(game.batch, "High Score: " + highScore, 0, Drop.WORLD_HEIGHT - 15);
 		game.batch.draw(bucketImage, bucket.x, bucket.y);
 		for (Rectangle raindrop : raindrops) {
 			game.batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -144,8 +146,13 @@ public class GameScreen implements Screen {
 		while (iter.hasNext()) {
 			Rectangle raindrop = iter.next();
 			raindrop.y -= RAINDROP_SPEED * Gdx.graphics.getDeltaTime();
-			if (raindrop.y + SPRITE_SIZE < 0)
+			if (raindrop.y + SPRITE_SIZE < 0){
 				iter.remove();
+                if (highScore < dropsGathered) {
+                    highScore = dropsGathered;
+                }
+                dropsGathered = 0;
+            }
 			if (raindrop.overlaps(bucket)) {
 				dropsGathered++;
 				dropSound.play();
