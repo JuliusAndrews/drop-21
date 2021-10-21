@@ -38,6 +38,8 @@ public class GameScreen implements Screen {
 	long lastDropTime;
 	int dropsGathered;
     int highScore;
+	int lifes = 3;
+	int difficulty=15;
 
     /**
      * Create the objects for this screen. Note that Screens use the constructor rather than a
@@ -111,6 +113,7 @@ public class GameScreen implements Screen {
 		game.batch.begin();
 		game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 0, Drop.WORLD_HEIGHT);
         game.font.draw(game.batch, "High Score: " + highScore, 0, Drop.WORLD_HEIGHT - 15);
+		game.font.draw(game.batch, "Lives: " + lifes, 0, Drop.WORLD_HEIGHT - 30);
 		game.batch.draw(bucketImage, bucket.x, bucket.y);
 		for (Rectangle raindrop : raindrops) {
 			game.batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -125,9 +128,9 @@ public class GameScreen implements Screen {
 			bucket.x = touchPos.x - SPRITE_SIZE / 2;
 		}
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
-			bucket.x -= BUCKET_SPEED * Gdx.graphics.getDeltaTime();
+			bucket.x -= (BUCKET_SPEED + dropsGathered*difficulty )* Gdx.graphics.getDeltaTime();
 		if (Gdx.input.isKeyPressed(Keys.RIGHT))
-			bucket.x += BUCKET_SPEED * Gdx.graphics.getDeltaTime();
+			bucket.x += (BUCKET_SPEED + dropsGathered *difficulty)* Gdx.graphics.getDeltaTime();
 
 		// make sure the bucket stays within the screen bounds
 		if (bucket.x < 0)
@@ -145,14 +148,19 @@ public class GameScreen implements Screen {
 		Iterator<Rectangle> iter = raindrops.iterator();
 		while (iter.hasNext()) {
 			Rectangle raindrop = iter.next();
-			raindrop.y -= RAINDROP_SPEED * Gdx.graphics.getDeltaTime();
+			raindrop.y -= (RAINDROP_SPEED + dropsGathered * difficulty )* Gdx.graphics.getDeltaTime();
 			if (raindrop.y + SPRITE_SIZE < 0){
 				iter.remove();
                 if (highScore < dropsGathered) {
                     highScore = dropsGathered;
                 }
                 dropsGathered = 0;
+				lifes --;
             }
+			if (lifes <=0){
+				game.setScreen(new GameOverScreen(game,highScore));
+				dispose();
+			}
 			if (raindrop.overlaps(bucket)) {
 				dropsGathered++;
 				dropSound.play();

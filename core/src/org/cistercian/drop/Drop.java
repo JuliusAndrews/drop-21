@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Drop extends Game {
 
     // constants
-    public static final int WORLD_WIDTH = 800;
-    public static final int WORLD_HEIGHT = 480;
+    public static final int WORLD_WIDTH = 900;
+    public static final int WORLD_HEIGHT = 900;
 
     // fields
     SpriteBatch batch;
