@@ -1,9 +1,11 @@
 package org.cistercian.drop;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
+
 
 /**
  * This class implements an opening Main Menu screen for the
@@ -39,11 +41,15 @@ public class MainMenuScreen implements Screen {
 
 		game.batch.begin();
 		game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
-		game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
+		game.font.draw(game.batch, "Hit Left to collect or Right to Dodge", 100, 100);
 		game.batch.end();
 
-		if (Gdx.input.isTouched()) {
-			game.setScreen(new GameScreen(game));
+		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+			game.setScreen(new GameScreen(game,1));
+			dispose();
+		}
+		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+			game.setScreen(new GameScreen(game,2));
 			dispose();
 		}
 	}

@@ -22,7 +22,7 @@ public class GameScreen implements Screen {
     private static final int SPRITE_SIZE = 64;
     private static final int RAINDROP_SPEED = 200;
 	private static final int RAINDROP_INTERVAL = 1_000_000_000;
-    private static final int BUCKET_SPEED = 200;
+    private static final int BUCKET_SPEED = 500;
 
     // Constant fields
 	final Drop game;
@@ -37,9 +37,12 @@ public class GameScreen implements Screen {
 	Array<Rectangle> raindrops;
 	long lastDropTime;
 	int dropsGathered;
+	int dropsMissed;
     int highScore;
 	int lifes = 3;
 	int difficulty=15;
+	int gameMode;
+	int score;
 
     /**
      * Create the objects for this screen. Note that Screens use the constructor rather than a
@@ -47,8 +50,9 @@ public class GameScreen implements Screen {
      * 
      * @param gam A reference to the central Game object.
      */
-    public GameScreen(final Drop gam) {
+    public GameScreen(final Drop gam, int mode) {
 		this.game = gam;
+		gameMode = mode;
 
 		// load the images for the droplet and the bucket, 64x64 pixels each
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
@@ -111,7 +115,11 @@ public class GameScreen implements Screen {
 		// begin a new batch and draw the bucket and
 		// all drops
 		game.batch.begin();
+		if (gameMode==1){
 		game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 0, Drop.WORLD_HEIGHT);
+		} else {
+		game.font.draw(game.batch, "Drops Dodged: " + dropsMissed, 0, Drop.WORLD_HEIGHT);
+		}
         game.font.draw(game.batch, "High Score: " + highScore, 0, Drop.WORLD_HEIGHT - 15);
 		game.font.draw(game.batch, "Lives: " + lifes, 0, Drop.WORLD_HEIGHT - 30);
 		game.batch.draw(bucketImage, bucket.x, bucket.y);
@@ -126,20 +134,29 @@ public class GameScreen implements Screen {
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
 			bucket.x = touchPos.x - SPRITE_SIZE / 2;
+			bucket.y = touchPos.y - SPRITE_SIZE / 2;
 		}
 		if (Gdx.input.isKeyPressed(Keys.LEFT))
-			bucket.x -= (BUCKET_SPEED + dropsGathered*difficulty )* Gdx.graphics.getDeltaTime();
+			bucket.x -= (BUCKET_SPEED + score*difficulty)* Gdx.graphics.getDeltaTime();
 		if (Gdx.input.isKeyPressed(Keys.RIGHT))
-			bucket.x += (BUCKET_SPEED + dropsGathered *difficulty)* Gdx.graphics.getDeltaTime();
+			bucket.x += (BUCKET_SPEED + score *difficulty)* Gdx.graphics.getDeltaTime();
+		if (Gdx.input.isKeyPressed(Keys.UP))
+			bucket.y += (BUCKET_SPEED + score *difficulty)* Gdx.graphics.getDeltaTime();
+		if (Gdx.input.isKeyPressed(Keys.DOWN))
+			bucket.y -= (BUCKET_SPEED + score *difficulty)* Gdx.graphics.getDeltaTime();
 
 		// make sure the bucket stays within the screen bounds
 		if (bucket.x < 0)
 			bucket.x = 0;
 		if (bucket.x > Drop.WORLD_WIDTH - SPRITE_SIZE)
 			bucket.x = Drop.WORLD_WIDTH - SPRITE_SIZE;
+		if (bucket.y < 0)
+			bucket.y = 0;
+		if (bucket.y > Drop.WORLD_HEIGHT - SPRITE_SIZE)
+			bucket.y = Drop.WORLD_HEIGHT - SPRITE_SIZE;
 
 		// check if we need to create a new raindrop
-		if (TimeUtils.nanoTime() - lastDropTime > RAINDROP_INTERVAL)
+		if (TimeUtils.nanoTime() - lastDropTime > (RAINDROP_INTERVAL-(score*10_000_000)))
 			spawnRaindrop();
 
 		// move the raindrops, remove any that are beneath the bottom edge of
@@ -147,15 +164,22 @@ public class GameScreen implements Screen {
 		// a sound effect as well.
 		Iterator<Rectangle> iter = raindrops.iterator();
 		while (iter.hasNext()) {
+			score = dropsGathered + dropsMissed;
 			Rectangle raindrop = iter.next();
-			raindrop.y -= (RAINDROP_SPEED + dropsGathered * difficulty )* Gdx.graphics.getDeltaTime();
+			raindrop.y -= (RAINDROP_SPEED + score * difficulty )* Gdx.graphics.getDeltaTime();
 			if (raindrop.y + SPRITE_SIZE < 0){
+				dropsMissed++;
+				dropsGathered = 0;
+				if (gameMode == 1){
+					lifes --;
+					} else {
+						dropSound.play();
+						if (highScore < dropsMissed) {
+							highScore = dropsMissed;
+						}
+					}
 				iter.remove();
-                if (highScore < dropsGathered) {
-                    highScore = dropsGathered;
-                }
-                dropsGathered = 0;
-				lifes --;
+				
             }
 			if (lifes <=0){
 				game.setScreen(new GameOverScreen(game,highScore));
@@ -163,7 +187,16 @@ public class GameScreen implements Screen {
 			}
 			if (raindrop.overlaps(bucket)) {
 				dropsGathered++;
-				dropSound.play();
+				dropsMissed = 0;
+				if (gameMode == 2){
+					lifes --;
+					} else {
+						dropSound.play();
+						if (highScore < dropsGathered) {
+							highScore = dropsGathered;
+						}
+					}
+
 				iter.remove();
 			}
 		}

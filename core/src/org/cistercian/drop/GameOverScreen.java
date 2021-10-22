@@ -40,9 +40,10 @@ public class GameOverScreen implements Screen {
 		game.font.draw(game.batch, "Hit Space to try again!", 100, 100);
 		game.batch.end();
 
-		if (Gdx.input.isKeyPressed(Keys.SPACE))
+		if (Gdx.input.isKeyPressed(Keys.SPACE)){
         game.setScreen(new MainMenuScreen(game));
         dispose();
+		}
 	}
 
     // The following methods are required by the Screen interface, but are not needed for this screen.
